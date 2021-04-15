@@ -491,6 +491,7 @@ namespace disc0ver {
 			// 默认开启面剔除
 			useCullFace = true;
 		}
+		STLModel(const std::string& path) :STLModel(path.c_str()) {}
 		void draw(Shader& shader) override;
 
 		// 我建议不要使用这个函数 因为模型文件有其对应的纹理(如果有 则相关信息可以在.mtl文件中找到) 添加不匹配的纹理可能造成奇怪的结果 这也是为什么它什么都不做
@@ -521,6 +522,7 @@ namespace disc0ver {
 			// 默认开启面剔除
 			useCullFace = true;
 		}
+		Model(const std::string& path) :Model(path.c_str()) {}
 		void draw(Shader& shader) override;
 
 		// 我建议不要使用这个函数 因为模型文件有其对应的纹理(如果有 则相关信息可以在.mtl文件中找到) 添加不匹配的纹理可能造成奇怪的结果 这也是为什么它什么都不做

@@ -28,6 +28,7 @@ namespace disc0ver {
 	public:
 		unsigned int ID;
 		Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
+		Shader(const std::string& vertexPath, const std::string& fragmentPath) :Shader(vertexPath.c_str(), fragmentPath.c_str()) {}
 		void use();
 
 		void setBool(const std::string& name, bool value) const
