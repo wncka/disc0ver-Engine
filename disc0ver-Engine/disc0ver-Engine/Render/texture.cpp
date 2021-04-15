@@ -25,11 +25,11 @@ std::unordered_map<std::string, disc0ver::Texture> disc0ver::Texture::textureHas
 disc0ver::Texture::Texture(std::string textureName, const GLchar* texturePath, TextureType textureType, bool flipVertically)
 {
 	/*
-	构造函数
-	参数一：该纹理的名称
-	参数二：该纹理对应图片的路径
-	参数三：该纹理对应的类型
-	参数四：是否翻转图片y轴
+		2D纹理对象构造函数
+		参数一：该纹理的名称
+		参数二：该纹理对应图片的路径
+		参数三：该纹理对应的类型
+		参数四：是否翻转图片y轴
 	*/
 	std::cout << "Loading texture......\n" << "Path: " << texturePath << "\nType: " << getTypeString(textureType) << "\n";
 
@@ -98,6 +98,65 @@ void disc0ver::Texture::use(unsigned int ID)
 	*/
 	glActiveTexture(GL_TEXTURE0 + ID);
 	glBindTexture(GL_TEXTURE_2D, texture);
+}
+
+disc0ver::cubeMapTexture::cubeMapTexture(const std::vector<std::string>& texturePaths, bool flipVertically)
+{
+	/*
+		立方体贴图纹理对象构造函数
+		参数一：6张纹理的路径 按照 右 左 上 下 前 后 的顺序给出
+		参数二：是否翻转图片y轴
+	*/
+	std::cout << "Loading cubemap texture......\n";
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
+	int width, height, nrChannels;
+	// 如果需要翻转图片的y轴
+	stbi_set_flip_vertically_on_load(flipVertically);
+	for (unsigned int i = 0; i < texturePaths.size(); i++)
+	{
+		std::cout << "Path " << i << " :" << texturePaths[i] << '\n';
+		unsigned char* data = stbi_load(texturePaths[i].c_str(), &width, &height, &nrChannels, 0);
+		GLenum format;
+		if (nrChannels == 1)
+			format = GL_RED;
+		else if (nrChannels == 3)
+			format = GL_RGB;
+		else if (nrChannels == 4)
+			format = GL_RGBA;
+		else
+		{
+			//  c++ error stream
+			std::cerr << "Texture image channel numbers error.\n\n";
+			stbi_image_free(data);
+			glDeleteTextures(1, &texture);
+			return;
+		}
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Failed to load cubemap texture at path " << i << "\n\n";
+			stbi_image_free(data);
+			glDeleteTextures(1, &texture);
+			return;
+		}
+	}
+	std::cout << "Loading success!\n\n";
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+}
+
+void disc0ver::cubeMapTexture::use(int ID)
+{
+	glActiveTexture(GL_TEXTURE0 + ID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 }
 
 void disc0ver::Material::setMaterial(DefaultMaterialType materialType)

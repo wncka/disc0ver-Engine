@@ -32,17 +32,28 @@ namespace disc0ver {
 	};
 
 	class Texture {
-		/*纹理对象*/
+		/* 2D纹理对象 */
 	public:
 		unsigned int texture;
 		Texture() :texture(0), textureType(TextureType::DIFFUSE) {}
+		/*
+			2D纹理对象构造函数
+			参数一：该纹理的名称
+			参数二：该纹理对应图片的路径
+			参数三：该纹理对应的类型
+			参数四：是否翻转图片y轴
+		*/
 		Texture(std::string textureName, const GLchar* texturePath, TextureType textureType = TextureType::DIFFUSE, bool flipVertically = true);
 		Texture(std::string textureName, std::string texturePath, TextureType textureType = TextureType::DIFFUSE, bool flipVertically = true) :
 			Texture(textureName, texturePath.c_str(), textureType, flipVertically) {}
+		// 激活参数ID所对应的纹理单元 并把该纹理对象绑定到上面
 		void use(unsigned int ID);
+		// 获得纹理的名称
 		std::string getName() const { return textureName; }
+		// 获得纹理的类型——返回值为TextureType
 		TextureType getType() const { return textureType; }
 
+		// 获得纹理的类型——返回值为string
 		static std::string getTypeString(TextureType textureType)
 		{
 			switch (textureType)
@@ -67,6 +78,38 @@ namespace disc0ver {
 		static std::unordered_map<std::string, Texture> textureHashTable;
 		std::string textureName;
 		TextureType textureType;
+	};
+
+	class cubeMapTexture {
+		/* 立方体贴图 这里主要用来实现天空盒效果 */
+	public:
+		// 纹理ID
+		unsigned int texture;
+		// 依据给定的路径数组构造立方体贴图(6张贴图路径按照 右 左 上 下 前 后 的顺序给出)
+		cubeMapTexture(const std::vector<std::string>& texturePaths, bool flipVertically = true);
+
+		cubeMapTexture(const cubeMapTexture& cmTexture) = delete;
+
+		cubeMapTexture& operator =(const cubeMapTexture& cmTexture) = delete;
+
+		cubeMapTexture(cubeMapTexture&& cmTexture)noexcept
+		{
+			texture = cmTexture.texture;
+			cmTexture.texture = 0;
+		}
+
+		cubeMapTexture& operator=(cubeMapTexture&& cmTexture)noexcept
+		{
+			texture = cmTexture.texture;
+			cmTexture.texture = 0;
+		}
+
+		~cubeMapTexture()
+		{
+			glDeleteTextures(1, &texture);
+		}
+		// 激活参数ID所对应的纹理单元 并把该纹理对象绑定到上面
+		void use(int ID);
 	};
 
 	enum class DefaultMaterialType
