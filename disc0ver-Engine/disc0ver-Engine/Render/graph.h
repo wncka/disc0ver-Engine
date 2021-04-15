@@ -47,6 +47,12 @@ namespace disc0ver {
 		Transform transform;
 	};
 
+	//==================================================面剔除===================================================
+	// 默认情况下 我们按照逆时针顺序定义一个三角面片 这样当观察者从正面观察这个三角面片时 它是一个正面三角形(逆时针方向绘制)
+	// 而背面三角形则是顺时针方向绘制 如果我们开启OpenGL的面剔除 它们将会被丢弃(不会被绘制) 从而提升效率
+	// 我们把选择权留给你 只需要修改模型的 useCullFace 变量即可
+	// 注意 2D模型一般不需要开启面剔除
+
 	//==================================================普通模型===================================================
 	// 普通模型的特点是初始化时不需要读取文件 所以任意类的普通模型初始化时的顶点数组和索引数组都是相等的
 	// 而且它们只有1个网格组成
@@ -101,8 +107,8 @@ namespace disc0ver {
 					{-0.5f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f}    // 左上
 				};
 				std::vector<unsigned int> indices = {
-					0, 1, 3,
-					1, 2, 3
+					2, 1, 0,
+					2, 0, 3
 				};
 				meshes.emplace_back(std::move(vertices), std::move(indices));
 			}
@@ -134,6 +140,7 @@ namespace disc0ver {
 				// 圆心
 				vertices.emplace_back(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f);
 				indices.emplace_back(0);
+				// xy平面 从x轴正半轴开始逆时针旋转
 				for (int i = 0; i <= num; i++)
 				{
 					radians = (i * 1.0) / num * 2 * pi;
@@ -167,18 +174,19 @@ namespace disc0ver {
 			int num = 120;
 			float pi = 3.1415926f;
 			float x, z, u, radians;
+			// xz平面 从x轴正半轴开始逆时针旋转
 			for (int i = 0; i <= num; i++)
 			{
 				u = (i * 1.0) / num;
 				radians = (i * 1.0) / num * 2 * pi;
-				x = r1 * cos(radians);
-				z = -r1 * sin(radians);
-				// 我们认为贴图是矩形的 而不是环形的
-				vertices.emplace_back(x, 0.0f, z, 0.0f, 1.0f, 0.0f, u, 0.0f);
-				indices.emplace_back(indices.size());
 				x = r2 * cos(radians);
 				z = -r2 * sin(radians);
+				// 我们认为贴图是矩形的 而不是环形的
 				vertices.emplace_back(x, 0.0f, z, 0.0f, 1.0f, 0.0f, u, 1.0f);
+				indices.emplace_back(indices.size());
+				x = r1 * cos(radians);
+				z = -r1 * sin(radians);
+				vertices.emplace_back(x, 0.0f, z, 0.0f, 1.0f, 0.0f, u, 0.0f);
 				indices.emplace_back(indices.size());
 			}
 			meshes.emplace_back(std::move(vertices), std::move(indices));
@@ -206,47 +214,48 @@ namespace disc0ver {
 			{
 				std::vector<Vertex> vertices = {
 					//     ---- 位置 ----       ---- 法向 ----     - 纹理坐标 -
+					// back 
 					{-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f},
+					{ 0.5f,  0.5f, -0.5f,  0.0f, 0.0f, -1.0f,  1.0f, 1.0f },
 					{ 0.5f, -0.5f, -0.5f,  0.0f, 0.0f, -1.0f,  1.0f, 0.0f },
 					{ 0.5f,  0.5f, -0.5f,  0.0f, 0.0f, -1.0f,  1.0f, 1.0f },
-					{ 0.5f,  0.5f, -0.5f,  0.0f, 0.0f, -1.0f,  1.0f, 1.0f },
-					{ -0.5f,  0.5f, -0.5f,  0.0f, 0.0f, -1.0f,  0.0f, 1.0f },
 					{ -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, -1.0f,  0.0f, 0.0f },
-
+					{ -0.5f, 0.5f, -0.5f,  0.0f, 0.0f, -1.0f,  0.0f, 1.0f },
+					// front
 					{ -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  1.0f,  0.0f, 0.0f },
 					{ 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  1.0f,  1.0f, 0.0f },
 					{ 0.5f,  0.5f,  0.5f,  0.0f, 0.0f,  1.0f,  1.0f, 1.0f },
 					{ 0.5f,  0.5f,  0.5f,  0.0f, 0.0f,  1.0f,  1.0f, 1.0f },
 					{ -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,  1.0f,  0.0f, 1.0f },
 					{ -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,  1.0f,  0.0f, 0.0f },
-
+					// left
 					{ -0.5f,  0.5f,  0.5f, -1.0f, 0.0f, 0.0f,  1.0f, 0.0f },
 					{ -0.5f,  0.5f, -0.5f, -1.0f, 0.0f, 0.0f,  1.0f, 1.0f },
 					{ -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,  0.0f, 1.0f },
 					{ -0.5f, -0.5f, -0.5f, -1.0f, 0.0f, 0.0f,  0.0f, 1.0f },
 					{ -0.5f, -0.5f,  0.5f, -1.0f, 0.0f, 0.0f,  0.0f, 0.0f },
 					{ -0.5f,  0.5f,  0.5f, -1.0f, 0.0f, 0.0f,  1.0f, 0.0f },
-
+					// right
 					{ 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f },
+					{ 0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f },
 					{ 0.5f,  0.5f, -0.5f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f },
 					{ 0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f },
-					{ 0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f },
-					{ 0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f },
 					{ 0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,  1.0f, 0.0f },
-
+					{ 0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f },
+					// bottom
 					{ -0.5f, -0.5f, -0.5f,  0.0f,-1.0f, 0.0f,  0.0f, 1.0f },
 					{ 0.5f, -0.5f, -0.5f,  0.0f,-1.0f, 0.0f,  1.0f, 1.0f },
 					{ 0.5f, -0.5f,  0.5f,  0.0f,-1.0f, 0.0f,  1.0f, 0.0f },
 					{ 0.5f, -0.5f,  0.5f,  0.0f,-1.0f, 0.0f,  1.0f, 0.0f },
 					{ -0.5f, -0.5f,  0.5f,  0.0f,-1.0f, 0.0f,  0.0f, 0.0f },
 					{ -0.5f, -0.5f, -0.5f,  0.0f,-1.0f, 0.0f,  0.0f, 1.0f },
-
+					// top
 					{ -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f },
+					{ 0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f },
 					{ 0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f },
 					{ 0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f },
-					{ 0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f },
-					{ -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f },
-					{ -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f }
+					{ -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f },
+					{ -0.5f,  0.5f, 0.5f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f }
 
 				};
 				std::vector<unsigned int> indices;
@@ -255,6 +264,7 @@ namespace disc0ver {
 					indices[i] = i;
 				meshes.emplace_back(std::move(vertices), std::move(indices));
 			}
+			useCullFace = true;
 		}
 		~cubeModel() {}
 		void draw(Shader& shader) override;
@@ -265,6 +275,8 @@ namespace disc0ver {
 		static std::vector<BaseMesh> meshes;
 		std::vector<Texture> textures;
 		Material material;
+		// 是否使用面剔除
+		bool useCullFace;
 	};
 
 	// 圆柱模型 感觉目前的实现不是很优雅- -
@@ -305,6 +317,7 @@ namespace disc0ver {
 				meshes.emplace_back(std::move(downCircleVertices), std::move(downCircleIndices));
 				meshes.emplace_back(std::move(midRectVertices), std::move(midRectIndices));
 			}
+			useCullFace = true;
 		}
 		~cylinderModel() {}
 		void draw(Shader& shader) override;
@@ -314,6 +327,7 @@ namespace disc0ver {
 		static std::vector<BaseMesh> meshes;
 		std::vector<Texture> textures;
 		Material material;
+		bool useCullFace;
 	};
 
 	// 球体模型
@@ -359,19 +373,20 @@ namespace disc0ver {
 							// 左下
 							int leftDown = rightDown + 1;
 							// 将该网格拆分为2个三角形
-							// 右上-右下-左下
+							// 右上-左上-左下
 							indices.emplace_back(rightUp);
-							indices.emplace_back(rightDown);
-							indices.emplace_back(leftDown);
-							// 右上-左下-左上
-							indices.emplace_back(rightUp);
-							indices.emplace_back(leftDown);
 							indices.emplace_back(leftUp);
+							indices.emplace_back(leftDown);
+							// 右上-左下-右下
+							indices.emplace_back(rightUp);
+							indices.emplace_back(leftDown);
+							indices.emplace_back(rightDown);
 						}
 					}
 				}
 				meshes.emplace_back(std::move(vertices), std::move(indices));
 			}
+			useCullFace = true;
 		}
 		~sphereModel() {}
 		void draw(Shader& shader) override;
@@ -381,6 +396,7 @@ namespace disc0ver {
 		static std::vector<BaseMesh> meshes;
 		std::vector<Texture> textures;
 		Material material;
+		bool useCullFace;
 	};
 
 	// 圆环模型
@@ -423,18 +439,19 @@ namespace disc0ver {
 						// 右上
 						int rightUp = leftUp + 1;
 						// 将该网格拆分为2个三角形
-						// 右上-右下-左下
+						// 右上-左上-左下
 						indices.emplace_back(rightUp);
-						indices.emplace_back(rightDown);
-						indices.emplace_back(leftDown);
-						// 右上-左下-左上
-						indices.emplace_back(rightUp);
-						indices.emplace_back(leftDown);
 						indices.emplace_back(leftUp);
+						indices.emplace_back(leftDown);
+						// 右上-左下-右下
+						indices.emplace_back(rightUp);
+						indices.emplace_back(leftDown);
+						indices.emplace_back(rightDown);
 					}
 				}
 			}
 			meshes.emplace_back(std::move(vertices), std::move(indices));
+			useCullFace = true;
 		}
 		~ringModel() {}
 		void draw(Shader& shader) override;
@@ -447,6 +464,7 @@ namespace disc0ver {
 		std::vector<BaseMesh> meshes;
 		std::vector<Texture> textures;
 		Material material;
+		bool useCullFace;
 	};
 
 	//==================================================特殊模型(需要读取文件 比如.stl .obj)===================================================
@@ -470,6 +488,8 @@ namespace disc0ver {
 			meshes.emplace_back(move(vertices), move(indices), std::vector<Texture>());
 			// 适度缩放模型
 			scale(meshes, transform);
+			// 默认开启面剔除
+			useCullFace = true;
 		}
 		void draw(Shader& shader) override;
 
@@ -482,6 +502,7 @@ namespace disc0ver {
 		std::vector<Mesh> meshes;
 		std::vector<Vertex> vertices;
 		std::vector<unsigned int> indices;
+		bool useCullFace;
 
 		void loadModel(const std::string path);
 
@@ -497,6 +518,8 @@ namespace disc0ver {
 			// 从指定路径读取obj文件 生成该模型的网格
 			loadModel(path);
 			scale(meshes, transform);
+			// 默认开启面剔除
+			useCullFace = true;
 		}
 		void draw(Shader& shader) override;
 
@@ -509,11 +532,37 @@ namespace disc0ver {
 		std::vector<Mesh> meshes;
 		std::vector<Vertex> vertices;
 		std::vector<unsigned int> indices;
+		bool useCullFace;
 
 		void loadModel(const std::string path);
 		void createMesh(const std::string& materialName, std::vector<Material>& materials);
 		void loadMaterial(std::vector<Material>& materials, std::string path);
 
+	};
+
+	// 天空盒
+	class skyBox
+	{
+	public:
+		// 天空盒构造函数(6张贴图路径按照 右 左 上 下 前 后 的顺序给出)
+		skyBox(const std::vector<std::string>& skyBoxTexturePaths, bool flipVertically = true) :texture(skyBoxTexturePaths, flipVertically)
+		{
+			setupSkyBox();
+		}
+		~skyBox()
+		{
+			glDeleteBuffers(1, &VBO);
+			glDeleteVertexArrays(1, &VAO);
+		}
+		// 绘制天空盒——绘制完其它模型后 再绘制天空盒(最后绘制)
+		void draw(Shader& skyboxShader);
+	private:
+		// cubeMap纹理对象
+		cubeMapTexture texture;
+		unsigned int VAO, VBO;
+		std::vector<float> vertices;
+		// 初始化天空盒(设置VAO、VBO对象)
+		void setupSkyBox();
 	};
 
 }

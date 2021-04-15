@@ -124,7 +124,10 @@ void disc0ver::cubeModel::draw(Shader& shader)
 {
 	/* 立方体模型——绘制 */
 	transform.use();
+	if (useCullFace)
+		glEnable(GL_CULL_FACE);
 	meshes[0].Draw(shader, textures, material);
+	glDisable(GL_CULL_FACE);
 }
 
 void disc0ver::cubeModel::addTexture(std::string textureName, const GLchar* texturePath)
@@ -143,9 +146,12 @@ void disc0ver::cylinderModel::draw(Shader& shader)
 	/* 圆柱模型——绘制 */
 	transform.use();
 	std::vector<Texture> emptyTextures;
+	if (useCullFace)
+		glEnable(GL_CULL_FACE);
 	meshes[0].Draw(shader, emptyTextures, material, GL_TRIANGLE_FAN);
 	meshes[1].Draw(shader, emptyTextures, material, GL_TRIANGLE_FAN);
 	meshes[2].Draw(shader, textures, material, GL_TRIANGLE_STRIP);
+	glDisable(GL_CULL_FACE);
 }
 
 void disc0ver::cylinderModel::addTexture(std::string textureName, const GLchar* texturePath)
@@ -164,7 +170,10 @@ void disc0ver::sphereModel::draw(Shader& shader)
 {
 	/* 球体模型——绘制 */
 	transform.use();
+	if (useCullFace)
+		glEnable(GL_CULL_FACE);
 	meshes[0].Draw(shader, textures, material);
+	glDisable(GL_CULL_FACE);
 }
 
 void disc0ver::sphereModel::addTexture(std::string textureName, const GLchar* texturePath)
@@ -179,7 +188,10 @@ void disc0ver::ringModel::draw(Shader& shader)
 {
 	/* 球体模型——绘制 */
 	transform.use();
+	if (useCullFace)
+		glEnable(GL_CULL_FACE);
 	meshes[0].Draw(shader, textures, material);
+	glDisable(GL_CULL_FACE);
 }
 
 void disc0ver::ringModel::addTexture(std::string textureName, const GLchar* texturePath)
@@ -194,10 +206,13 @@ void disc0ver::STLModel::draw(Shader& shader)
 {
 	/* .stl Model 绘制 */
 	transform.use();
+	if (useCullFace)
+		glEnable(GL_CULL_FACE);
 	for (auto& mesh : meshes)
 	{
 		mesh.Draw(shader);
 	}
+	glDisable(GL_CULL_FACE);
 }
 
 void disc0ver::STLModel::loadModel(const std::string path)
@@ -274,10 +289,13 @@ void disc0ver::Model::draw(Shader& shader)
 {
 	/* .obj 模型绘制 */
 	transform.use();
+	if (useCullFace)
+		glEnable(GL_CULL_FACE);
 	for (auto& mesh : meshes)
 	{
 		mesh.Draw(shader);
 	}
+	glDisable(GL_CULL_FACE);
 }
 
 void disc0ver::Model::loadModel(const std::string path)
@@ -597,4 +615,76 @@ void disc0ver::Model::loadMaterial(std::vector<Material>& materials, std::string
 	}
 	if (listening)
 		materials.push_back(tempMaterial);
+}
+
+//========================================== skyBox ======================================
+void disc0ver::skyBox::setupSkyBox()
+{
+	// 一个立方体
+	vertices = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+	// 初始化、绑定 VAO、VBO对象
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0));
+	glEnableVertexAttribArray(0);
+	glBindVertexArray(0);
+}
+
+void disc0ver::skyBox::draw(Shader& skyboxShader)
+{
+	// 最后绘制天空盒
+	glDepthFunc(GL_LEQUAL);
+	texture.use(0);
+	// 注意glsl代码中的samplerCube对象名称要与这个对应 即应为skybox
+	skyboxShader.setInt("skybox", 0);
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+	glDepthFunc(GL_LESS);
 }
