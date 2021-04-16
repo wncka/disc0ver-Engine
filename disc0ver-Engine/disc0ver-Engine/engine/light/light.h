@@ -80,9 +80,20 @@ namespace disc0ver {
 			AttenuationLight(ambient, diffuse, specular, constant, linear, quadratic), position(position), direction(direction), cutOff(cutOff), outerCutOff(outerCutOff) {}
 	};
 
-
+	/*
+		为glsl中的方向光uniform变量设置所有属性的值：
+		direction ambient diffuse specular
+	*/
 	void setLightAllAttribute(const Shader& shader, const std::string& uniformName, const std::vector<DirLight>& dirLights);
+	/*
+		为glsl中的点光源uniform变量设置所有属性的值:
+		position ambient diffuse specular constant linear quadratic
+	*/
 	void setLightAllAttribute(const Shader& shader, const std::string& uniformName, const std::vector<PointLight>& pointLights);
+	/*
+		为glsl中的聚光灯uniform变量设置所有属性的值:
+		position direction ambient diffuse specular constant linear quadratic cutOff outerCutOff
+	*/
 	void setLightAllAttribute(const Shader& shader, const std::string& uniformName, const std::vector<SpotLight>& spotLights);
 }
 
