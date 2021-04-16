@@ -556,6 +556,7 @@ namespace disc0ver {
 				glDeleteVertexArrays(1, &VAO);
 			setupSkyBox();
 		}
+		skyBox() :VAO(0), VBO(0) {}
 		// 天空盒构造函数(6张贴图路径按照 右 左 上 下 前 后 的顺序给出)
 		skyBox(const std::vector<std::string>& skyBoxTexturePaths, bool flipVertically = true) :texture(skyBoxTexturePaths, flipVertically)
 		{
