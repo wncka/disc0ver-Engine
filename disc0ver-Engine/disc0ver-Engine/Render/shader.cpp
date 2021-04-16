@@ -7,11 +7,12 @@
 
 #include "shader.h"
 
-disc0ver::Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
+void disc0ver::Shader::init(const GLchar* vertexPath, const GLchar* fragmentPath)
+{
 	/*
-	着色器程序构造函数
-	参数一：顶点着色器代码文件路径
-	参数二：片段着色器代码文件路径
+		初始化着色器程序
+		参数一：顶点着色器代码文件路径
+		参数二：片段着色器代码文件路径
 	*/
 	std::string vertexCode, fragmentCode;
 	std::ifstream vShaderFile, fShaderFile;
@@ -41,7 +42,10 @@ disc0ver::Shader::Shader(const GLchar* vertexPath, const GLchar* fragmentPath) {
 	glShaderSource(fragmentShader, 1, &fShaderCode, NULL);
 	glCompileShader(fragmentShader);
 	errorCheck(fragmentShader, "FRAGMENT");
-
+	if (ID)
+	{
+		glDeleteShader(ID);
+	}
 	// 链接
 	ID = glCreateProgram();
 	glAttachShader(ID, vertexShader);

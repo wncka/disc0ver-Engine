@@ -546,6 +546,16 @@ namespace disc0ver {
 	class skyBox
 	{
 	public:
+		// 天空盒初始化函数(6张贴图路径按照 右 左 上 下 前 后 的顺序给出)
+		void init(const std::vector<std::string>& skyBoxTexturePaths, bool flipVertically = true)
+		{
+			texture.init(skyBoxTexturePaths, flipVertically);
+			if (VBO)
+				glDeleteBuffers(1, &VBO);
+			if (VAO)
+				glDeleteVertexArrays(1, &VAO);
+			setupSkyBox();
+		}
 		// 天空盒构造函数(6张贴图路径按照 右 左 上 下 前 后 的顺序给出)
 		skyBox(const std::vector<std::string>& skyBoxTexturePaths, bool flipVertically = true) :texture(skyBoxTexturePaths, flipVertically)
 		{
@@ -561,7 +571,7 @@ namespace disc0ver {
 	private:
 		// cubeMap纹理对象
 		cubeMapTexture texture;
-		unsigned int VAO, VBO;
+		unsigned int VAO = 0, VBO = 0;
 		std::vector<float> vertices;
 		// 初始化天空盒(设置VAO、VBO对象)
 		void setupSkyBox();

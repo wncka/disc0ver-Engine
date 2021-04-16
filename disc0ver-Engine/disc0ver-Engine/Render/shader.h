@@ -26,9 +26,37 @@ namespace disc0ver {
 	class Shader {
 		/* 着色器程序 */
 	public:
-		unsigned int ID;
-		Shader(const GLchar* vertexPath, const GLchar* fragmentPath);
+		unsigned int ID = 0;
+		Shader() :ID(0) {}
+		// 着色器构造函数 顶点着色器的路径和片段着色器的路径
+		Shader(const GLchar* vertexPath, const GLchar* fragmentPath)
+		{
+			init(vertexPath, fragmentPath);
+		}
 		Shader(const std::string& vertexPath, const std::string& fragmentPath) :Shader(vertexPath.c_str(), fragmentPath.c_str()) {}
+		Shader(const Shader& shader) = delete;
+		Shader& operator=(const Shader& shader) = delete;
+		Shader(Shader&& shader) :ID(shader.ID)
+		{
+			shader.ID = 0;
+		}
+		Shader& operator=(Shader&& shader)
+		{
+			ID = shader.ID;
+			shader.ID = 0;
+		}
+		~Shader()
+		{
+			glDeleteShader(ID);
+		}
+		// 初始化着色器程序
+		void init(const GLchar* vertexPath, const GLchar* fragmentPath);
+		// 初始化着色器程序
+		void init(const std::string& vertexPath, const std::string& fragmentPath)
+		{
+			init(vertexPath.c_str(), fragmentPath.c_str());
+		}
+
 		void use();
 
 		void setBool(const std::string& name, bool value) const

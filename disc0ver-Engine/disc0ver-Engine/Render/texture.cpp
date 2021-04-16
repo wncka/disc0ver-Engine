@@ -100,14 +100,18 @@ void disc0ver::Texture::use(unsigned int ID)
 	glBindTexture(GL_TEXTURE_2D, texture);
 }
 
-disc0ver::cubeMapTexture::cubeMapTexture(const std::vector<std::string>& texturePaths, bool flipVertically)
+void disc0ver::cubeMapTexture::init(const std::vector<std::string>& texturePaths, bool flipVertically)
 {
 	/*
-		立方体贴图纹理对象构造函数
+		立方体贴图纹理对象初始化函数
 		参数一：6张纹理的路径 按照 右 左 上 下 前 后 的顺序给出
 		参数二：是否翻转图片y轴
 	*/
 	std::cout << "Loading cubemap texture......\n";
+	if (texture)
+	{
+		glDeleteTextures(1, &texture);
+	}
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 	int width, height, nrChannels;

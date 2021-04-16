@@ -84,9 +84,16 @@ namespace disc0ver {
 		/* 立方体贴图 这里主要用来实现天空盒效果 */
 	public:
 		// 纹理ID
-		unsigned int texture;
+		unsigned int texture = 0;
+
 		// 依据给定的路径数组构造立方体贴图(6张贴图路径按照 右 左 上 下 前 后 的顺序给出)
-		cubeMapTexture(const std::vector<std::string>& texturePaths, bool flipVertically = true);
+		void init(const std::vector<std::string>& texturePaths, bool flipVertically = true);
+
+		// 依据给定的路径数组构造立方体贴图(6张贴图路径按照 右 左 上 下 前 后 的顺序给出)
+		cubeMapTexture(const std::vector<std::string>& texturePaths, bool flipVertically = true)
+		{
+			init(texturePaths, flipVertically);
+		}
 
 		cubeMapTexture(const cubeMapTexture& cmTexture) = delete;
 
