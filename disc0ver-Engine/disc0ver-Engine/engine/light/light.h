@@ -16,10 +16,9 @@
 #include <glad/glad.h>
 #include "../../render/transform.h"
 #include "../../render/shader.h"
+#include <vector>
 
 namespace disc0ver {
-
-	using std::string;
 
 	//基础光源 有三个颜色分量:环境光 漫反射光 镜面光
 	class BaseLight
@@ -82,9 +81,9 @@ namespace disc0ver {
 	};
 
 
-	void setLightAllAttribute(const Shader& shader, const string& uniformName, const DirLight* dirLights, int len = 1);
-	void setLightAllAttribute(const Shader& shader, const string& uniformName, const PointLight* pointLights, int len = 1);
-	void setLightAllAttribute(const Shader& shader, const string& uniformName, const SpotLight* spotLights, int len = 1);
+	void setLightAllAttribute(const Shader& shader, const std::string& uniformName, const std::vector<DirLight>& dirLights);
+	void setLightAllAttribute(const Shader& shader, const std::string& uniformName, const std::vector<PointLight>& pointLights);
+	void setLightAllAttribute(const Shader& shader, const std::string& uniformName, const std::vector<SpotLight>& spotLights);
 }
 
 #endif // !LIGHT_H
