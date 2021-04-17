@@ -195,7 +195,7 @@ void disc0ver::test_master_scene::renderLoop()
 	bool show_demo_window = true;
 	//记录时间帧间隔
 	float deltaTime = 0.0f;
-	float lastFrame = 0.0f;
+	float lastFrame = glfwGetTime();
 
 	//开启深度测试
 	glEnable(GL_DEPTH_TEST);
@@ -275,6 +275,158 @@ void disc0ver::test_master_scene::renderLoop()
 }
 
 void disc0ver::test_master_scene::afterRenderLoop()
+{
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+}
+
+//========================================== refractionSkyBoxScene ======================================
+
+void disc0ver::refractionSkyBoxScene::guiInit()
+{
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui_ImplGlfw_InitForOpenGL(window.getGlfwWindowObject(), true);
+	ImGui_ImplOpenGL3_Init("#version 420 core");
+	ImGui::StyleColorsClassic();
+}
+
+void disc0ver::refractionSkyBoxScene::cameraInit()
+{
+	camera.position_ = glm::vec3(0.0f, 0.0f, 3.0f);
+	// 记得将其与窗口绑定
+	window.setWindowCamera(&camera);
+}
+
+void disc0ver::refractionSkyBoxScene::shaderInit()
+{
+	modelShader.init("shader/refraction_skybox.vs", "shader/refraction_skybox.fs");
+	//modelShader.init("shader/reflection_skybox.vs", "shader/reflection_skybox.fs");
+	skyboxShader.init("shader/skybox_shader.vs", "shader/skybox_shader.fs");
+}
+
+void disc0ver::refractionSkyBoxScene::modelInit()
+{
+	//std::shared_ptr<disc0ver::IBaseModel> cube = std::make_shared<disc0ver::cubeModel>();
+	//std::shared_ptr<disc0ver::IBaseModel> cube = std::make_shared<disc0ver::Model>("models/objModels/Nanosuit/nanosuit.obj");
+	std::shared_ptr<disc0ver::IBaseModel> cube = std::make_shared<disc0ver::sphereModel>();
+	models.push_back(cube);
+}
+
+void disc0ver::refractionSkyBoxScene::lightInit()
+{
+}
+
+void disc0ver::refractionSkyBoxScene::skyboxInit()
+{
+	// 依据skybox文件夹的数量 生成多个skybox对象
+	std::vector<std::string> skyboxTexturePaths = {
+		"images/skybox/skybox1/right.png",
+		"images/skybox/skybox1/left.png",
+		"images/skybox/skybox1/top.png",
+		"images/skybox/skybox1/bottom.png",
+		"images/skybox/skybox1/back.png",
+		"images/skybox/skybox1/front.png"
+	};
+	std::vector<int> idx(skyboxTexturePaths.size());
+	for (int i = 0; i < idx.size(); i++)
+		idx[i] = skyboxTexturePaths[i].rfind('1');
+	for (int i = 1; i <= 4; i++)
+	{
+		for (int j = 0; j < skyboxTexturePaths.size(); j++)
+			skyboxTexturePaths[j][idx[j]] = '0' + i;
+		skyboxs.emplace_back(skyboxTexturePaths, false);
+	}
+}
+
+void disc0ver::refractionSkyBoxScene::beforeRenderLoop()
+{
+}
+
+void disc0ver::refractionSkyBoxScene::renderLoop()
+{
+	bool show_demo_window = true;
+	//记录时间帧间隔
+	float deltaTime = 0.0f;
+	float lastFrame = glfwGetTime();
+
+	//开启深度测试
+	glEnable(GL_DEPTH_TEST);
+
+	//按时间间隔切换skybox
+	unsigned int idx = 0;
+	float switchTime = 10.0f;
+	float curTime = 0.0f;
+
+	while (!window.shouldClose()) {
+
+		window.pollEvents();
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+		{
+			ImGui::Begin("Another Window", &show_demo_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+			ImGui::Text("Hello from another window!");
+			if (ImGui::Button("Close Me"))
+				//glfwSetWindowShouldClose(window, true);
+				glfwSetWindowShouldClose(window.getGlfwWindowObject(), true);
+			if (ImGui::Button("new window"))
+			{
+				GLFWwindow* newwindow = glfwCreateWindow(800, 600, "new window", NULL, NULL);
+
+			}
+			ImGui::End();
+		}
+		ImGui::Render();
+
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+		std::cout << deltaTime << '\n';
+
+		curTime += deltaTime;
+		std::cout << curTime << ' ' << skyboxs.size() << '\n';
+		if (curTime > switchTime)
+		{
+			curTime = 0.0f;
+			idx = (idx + 1) % skyboxs.size();
+		}
+
+		window.processInput(deltaTime);
+
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		modelShader.use();
+		glm::mat4 projection = glm::perspective(glm::radians(camera.zoom_), (float)window.getWindowWidth() / (float)window.getWindowHeight(), 0.1f, 100.0f);
+		modelShader.setMat4("projection", projection);
+
+		glm::mat4 view = camera.GetViewMatrix();
+		modelShader.setMat4("view", view);
+		modelShader.setVec3("viewPos", camera.position_);
+		skyboxs[idx].getCubeMapTexture().use(0);
+		modelShader.setInt("skybox", 0);
+		for (auto& model : models)
+		{
+			modelShader.setMat4("model", model->transform.trans);
+			model->draw(modelShader);
+		}
+
+		skyboxShader.use();
+		skyboxShader.setMat4("view", glm::mat4(glm::mat3(view)));
+		skyboxShader.setMat4("projection", projection);
+		skyboxs[idx].draw(skyboxShader);
+
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		window.swapBuffers();
+	}
+}
+
+void disc0ver::refractionSkyBoxScene::afterRenderLoop()
 {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();

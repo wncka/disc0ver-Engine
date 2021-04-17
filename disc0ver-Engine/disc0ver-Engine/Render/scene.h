@@ -116,5 +116,48 @@ namespace disc0ver {
 		void afterRenderLoop() override;
 	};
 
+	class refractionSkyBoxScene :public BaseScene
+	{
+	public:
+
+		// 构造函数
+		refractionSkyBoxScene() :window(disc0ver::Window::getInstance())
+		{
+			if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+				throw "Failed to initialize GLAD";
+			}
+			guiInit();
+			cameraInit();
+			shaderInit();
+			modelInit();
+			lightInit();
+			skyboxInit();
+		}
+		~refractionSkyBoxScene() {}
+
+		// 窗口对象的引用
+		disc0ver::Window& window;
+		// FPS相机
+		disc0ver::FPSCamera camera;
+		// 着色器
+		disc0ver::Shader modelShader;
+		disc0ver::Shader skyboxShader;
+		// 模型
+		std::vector<std::shared_ptr<disc0ver::IBaseModel>> models;
+		// 天空盒
+		std::vector<disc0ver::skyBox> skyboxs;
+	private:
+		void guiInit() override;
+		void cameraInit() override;
+		void shaderInit() override;
+		void modelInit() override;
+		void lightInit() override;
+		void skyboxInit() override;
+		void beforeRenderLoop() override;
+		void renderLoop() override;
+		void afterRenderLoop() override;
+
+	};
+
 }
 #endif
