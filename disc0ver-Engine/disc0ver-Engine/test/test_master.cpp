@@ -6,7 +6,9 @@ int test_master_main() {
 	//glfw初始化
 	glfwInit();
 
-	disc0ver::test_master_scene scene;
+	/*disc0ver::test_master_scene scene;
+	scene.draw();*/
+	disc0ver::refractionSkyBoxScene scene;
 	scene.draw();
 	glfwTerminate();
 
