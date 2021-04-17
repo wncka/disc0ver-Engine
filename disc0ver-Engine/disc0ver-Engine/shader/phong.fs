@@ -1,69 +1,4 @@
-/*
-#version 420 core
-out vec4 FragColor;
-
-struct Material
-{
-  // 漫反射(环境光)贴图 
-	sampler2D texture_diffuse;
-  // 镜面光贴图
-	sampler2D texture_specular;
-  // 是否使用上述贴图
-	bool use_texture_diffuse;
-  bool use_texture_specular;
-  // 环境光、漫反射、镜面光 颜色分量(如果不使用贴图 将使用这些值进行计算)
-	vec3 ambient_color;
-  vec3 diffuse_color;
-  vec3 specular_color;
-  // 镜面高光
-  float shininess;
-};
-
-uniform Material material;
-
-in vec3 Normal;  
-in vec3 FragPos;  
-in vec2 TexCoord;
-
-uniform int uTextureSample;
-uniform sampler2D texture1;
-uniform vec3 uKd;
-uniform vec3 uKs;
-uniform float uLightIntensity;
-  
-uniform vec3 lightPos; 
-uniform vec3 viewPos; 
-uniform vec3 lightColor;
-uniform vec3 objectColor;
-
-void main(void) {
-  vec3 color;
-  if (uTextureSample == 1) {
-    color = pow(texture(texture1, TexCoord).rgb, vec3(2.2));
-  } else {
-    color = uKd;
-  }
-  
-  vec3 ambient = 0.05 * color;
-
-  vec3 lightDir = normalize(lightPos - FragPos);
-  vec3 normal = normalize(Normal);
-  float diff = max(dot(lightDir, normal), 0.0);
-  float light_atten_coff = 10.0 / length(lightPos - FragPos);
-  vec3 diffuse =  diff * color * light_atten_coff;
-
-  vec3 viewDir = normalize(viewPos - FragPos);
-  vec3 reflectDir = reflect(-lightDir, normal);
-  float spec = pow (max(dot(viewDir, reflectDir), 0.0), 35.0);
-  vec3 specular = lightColor * spec * light_atten_coff;  
-  
-  FragColor = vec4(pow((ambient + diffuse + specular), vec3(1.0/2.2)), 1.0);
-  FragColor = texture(texture1, TexCoord);
-  FragColor = texture(material.texture_diffuse, TexCoord);
-}
-*/
-
-
+// Phong光照模型 片段着色器
 #version 420 core
 
 // 材质
@@ -141,7 +76,7 @@ uniform Material material;
 // 方向光
 uniform DirLight dirLight;
 // 点光源个数
-#define NR_POINT_LIGHTS 2
+#define NR_POINT_LIGHTS 4
 // 点光源数组
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 // 聚光灯

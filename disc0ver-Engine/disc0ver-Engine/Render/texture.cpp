@@ -91,7 +91,7 @@ disc0ver::Texture::Texture(std::string textureName, const GLchar* texturePath, T
 	}
 }
 
-void disc0ver::Texture::use(unsigned int ID)
+void disc0ver::Texture::use(unsigned int ID)const
 {
 	/*
 	激活参数ID所对应的纹理单元 并把该纹理对象绑定到上面
@@ -104,7 +104,7 @@ void disc0ver::cubeMapTexture::init(const std::vector<std::string>& texturePaths
 {
 	/*
 		立方体贴图纹理对象初始化函数
-		参数一：6张纹理的路径 按照 右 左 上 下 前 后 的顺序给出
+		参数一：6张纹理的路径 按照 右 左 上 下 后 前 的顺序给出
 		参数二：是否翻转图片y轴
 	*/
 	std::cout << "Loading cubemap texture......\n";
@@ -157,7 +157,7 @@ void disc0ver::cubeMapTexture::init(const std::vector<std::string>& texturePaths
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
-void disc0ver::cubeMapTexture::use(int ID)
+void disc0ver::cubeMapTexture::use(int ID)const
 {
 	glActiveTexture(GL_TEXTURE0 + ID);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);

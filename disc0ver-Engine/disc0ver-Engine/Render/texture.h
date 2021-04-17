@@ -47,7 +47,7 @@ namespace disc0ver {
 		Texture(std::string textureName, std::string texturePath, TextureType textureType = TextureType::DIFFUSE, bool flipVertically = true) :
 			Texture(textureName, texturePath.c_str(), textureType, flipVertically) {}
 		// 激活参数ID所对应的纹理单元 并把该纹理对象绑定到上面
-		void use(unsigned int ID);
+		void use(unsigned int ID)const;
 		// 获得纹理的名称
 		std::string getName() const { return textureName; }
 		// 获得纹理的类型——返回值为TextureType
@@ -86,12 +86,12 @@ namespace disc0ver {
 		// 纹理ID
 		unsigned int texture = 0;
 
-		// 依据给定的路径数组构造立方体贴图(6张贴图路径按照 右 左 上 下 前 后 的顺序给出)
+		// 依据给定的路径数组构造立方体贴图(6张贴图路径按照 右 左 上 下 后 前 的顺序给出)
 		void init(const std::vector<std::string>& texturePaths, bool flipVertically = true);
 
 		cubeMapTexture() :texture(0) {}
 
-		// 依据给定的路径数组构造立方体贴图(6张贴图路径按照 右 左 上 下 前 后 的顺序给出)
+		// 依据给定的路径数组构造立方体贴图(6张贴图路径按照 右 左 上 下 后 前 的顺序给出)
 		cubeMapTexture(const std::vector<std::string>& texturePaths, bool flipVertically = true)
 		{
 			init(texturePaths, flipVertically);
@@ -118,7 +118,7 @@ namespace disc0ver {
 			glDeleteTextures(1, &texture);
 		}
 		// 激活参数ID所对应的纹理单元 并把该纹理对象绑定到上面
-		void use(int ID);
+		void use(int ID)const;
 	};
 
 	enum class DefaultMaterialType
