@@ -546,7 +546,7 @@ namespace disc0ver {
 	class skyBox
 	{
 	public:
-		// 天空盒初始化函数(6张贴图路径按照 右 左 上 下 前 后 的顺序给出)
+		// 天空盒初始化函数(6张贴图路径按照 右 左 上 下 后 前 的顺序给出)
 		void init(const std::vector<std::string>& skyBoxTexturePaths, bool flipVertically = true)
 		{
 			texture.init(skyBoxTexturePaths, flipVertically);
@@ -557,11 +557,28 @@ namespace disc0ver {
 			setupSkyBox();
 		}
 		skyBox() :VAO(0), VBO(0) {}
-		// 天空盒构造函数(6张贴图路径按照 右 左 上 下 前 后 的顺序给出)
+		// 天空盒构造函数(6张贴图路径按照 右 左 上 下 后 前 的顺序给出)
 		skyBox(const std::vector<std::string>& skyBoxTexturePaths, bool flipVertically = true) :texture(skyBoxTexturePaths, flipVertically)
 		{
 			setupSkyBox();
 		}
+		skyBox(const skyBox& skybox) = delete;
+		skyBox& operator=(const skyBox& skybox) = delete;
+
+		skyBox(skyBox&& skybox)noexcept :texture(std::move(skybox.texture)), VAO(skybox.VAO), VBO(skybox.VBO), vertices(std::move(skybox.vertices))
+		{
+			skybox.VAO = skybox.VBO = 0;
+		}
+
+		skyBox& operator=(skyBox&& skybox)noexcept
+		{
+			texture = std::move(skybox.texture);
+			VAO = skybox.VAO;
+			VBO = skybox.VBO;
+			vertices = std::move(skybox.vertices);
+			skybox.VAO = skybox.VBO = 0;
+		}
+
 		~skyBox()
 		{
 			glDeleteBuffers(1, &VBO);
@@ -569,6 +586,12 @@ namespace disc0ver {
 		}
 		// 绘制天空盒——绘制完其它模型后 再绘制天空盒(最后绘制)
 		void draw(Shader& skyboxShader);
+
+		// 返回cubeMap纹理对象
+		const cubeMapTexture& getCubeMapTexture()
+		{
+			return texture;
+		}
 	private:
 		// cubeMap纹理对象
 		cubeMapTexture texture;
