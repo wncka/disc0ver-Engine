@@ -27,6 +27,7 @@ namespace disc0ver {
 		Transform() = default;
 		Transform(Rotation rotation, Position position, Scale scale) : rotation(rotation), position(position), scale(scale), trans(glm::mat4(1.0)) {}
 		glm::mat4 trans = glm::mat4(1.0f);
+		// 计算变换矩阵
 		void use();
 		//private:
 			//旋转 平移 缩放矩阵
