@@ -34,6 +34,88 @@
 
 namespace disc0ver {
 
+	// 场景节点 主要用于定义场景中模型之间的父子关系
+	// 从而帮助我们更好的设计动画效果
+	class SceneNode
+	{
+	public:
+		// 该场景节点对应的模型
+		std::shared_ptr<IBaseModel> model;
+		// 该场景节点的子节点
+		std::vector<std::shared_ptr<SceneNode>> children;
+
+		SceneNode() = default;
+		SceneNode(const std::shared_ptr<IBaseModel>& m) :model(m) {}
+
+		void addChild(const std::shared_ptr<SceneNode>& child)
+		{
+			children.push_back(child);
+		}
+
+		void addChild(const std::initializer_list<std::shared_ptr<SceneNode>>& childs)
+		{
+			for (auto& child : childs)
+			{
+				children.push_back(child);
+			}
+		}
+
+		std::shared_ptr<SceneNode>& addChild(const std::shared_ptr<IBaseModel>& childModel)
+		{
+			std::shared_ptr<SceneNode> childNode = std::make_shared<SceneNode>(childModel);
+			children.push_back(childNode);
+			return children.back();
+		}
+
+		void updateMatrix(const glm::mat4& parrentMatrix = glm::mat4(1.0f))
+		{
+			model->transform.trans = parrentMatrix * model->transform.trans;
+			for (auto& child : children)
+			{
+				child->updateMatrix(model->transform.trans);
+			}
+		}
+	};
+
+	// 场景根节点 用来管理场景节点 简化一些操作
+	class SceneRootNode
+	{
+	public:
+		std::vector<std::shared_ptr<SceneNode>> children;
+
+		SceneRootNode() = default;
+
+		SceneRootNode(const std::initializer_list<std::shared_ptr<SceneNode>>& nodes)
+		{
+			for (const auto& node : nodes)
+			{
+				children.push_back(node);
+			}
+		}
+
+		void addChild(const std::shared_ptr<SceneNode>& node)
+		{
+			children.push_back(node);
+		}
+
+		void addChild(const std::initializer_list<std::shared_ptr<SceneNode>>& nodes)
+		{
+			for (const auto& node : nodes)
+			{
+				children.push_back(node);
+			}
+		}
+
+		void updateMatrix(const glm::mat4& initMatrix = glm::mat4(1.0f))
+		{
+			for (auto& child : children)
+			{
+				child->updateMatrix(initMatrix);
+			}
+		}
+	};
+
+	// 基础场景类 定义场景的接口
 	class BaseScene
 	{
 	public:
@@ -157,6 +239,102 @@ namespace disc0ver {
 		void renderLoop() override;
 		void afterRenderLoop() override;
 
+	};
+
+	class galaxyScene :public BaseScene
+	{
+	public:
+		// 构造函数
+		galaxyScene() :window(disc0ver::Window::getInstance())
+		{
+			if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+				throw "Failed to initialize GLAD";
+			}
+			guiInit();
+			cameraInit();
+			shaderInit();
+			modelInit();
+			lightInit();
+			skyboxInit();
+		}
+		~galaxyScene() {}
+
+		// 窗口对象的引用
+		disc0ver::Window& window;
+		// FPS相机
+		disc0ver::FPSCamera camera;
+		// 着色器
+		disc0ver::Shader modelShader;
+		disc0ver::Shader skyboxShader;
+		// 模型
+		std::vector<std::shared_ptr<disc0ver::IBaseModel>> models;
+		// 场景根节点 用来处理节点间的关系
+		disc0ver::SceneRootNode sceneRootNode;
+		// 光源
+		std::vector<disc0ver::DirLight> dirLight;
+		std::vector<disc0ver::PointLight> pointLights;
+		std::vector<disc0ver::SpotLight> spotLight;
+		// 天空盒
+		disc0ver::skyBox skybox;
+	private:
+		void guiInit() override;
+		void cameraInit() override;
+		void shaderInit() override;
+		void modelInit() override;
+		void lightInit() override;
+		void skyboxInit() override;
+		void beforeRenderLoop() override;
+		void renderLoop() override;
+		void afterRenderLoop() override;
+	};
+
+	class blockGuyAnimationScene :public BaseScene
+	{
+	public:
+		// 构造函数
+		blockGuyAnimationScene() :window(disc0ver::Window::getInstance())
+		{
+			if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+				throw "Failed to initialize GLAD";
+			}
+			guiInit();
+			cameraInit();
+			shaderInit();
+			modelInit();
+			lightInit();
+			skyboxInit();
+		}
+		~blockGuyAnimationScene() {}
+
+		// 窗口对象的引用
+		disc0ver::Window& window;
+		// FPS相机
+		disc0ver::FPSCamera camera;
+		// 着色器
+		disc0ver::Shader modelShader;
+		disc0ver::Shader skyboxShader;
+		// 模型
+		std::vector<std::shared_ptr<disc0ver::IBaseModel>> models;
+		// 变量名称到模型数组下标的映射
+		std::unordered_map<std::string, unsigned int> namesToModelIndex;
+		// 场景根节点 用来处理节点间的关系
+		disc0ver::SceneRootNode sceneRootNode;
+		// 光源
+		std::vector<disc0ver::DirLight> dirLight;
+		std::vector<disc0ver::PointLight> pointLights;
+		std::vector<disc0ver::SpotLight> spotLight;
+		// 天空盒
+		disc0ver::skyBox skybox;
+	private:
+		void guiInit() override;
+		void cameraInit() override;
+		void shaderInit() override;
+		void modelInit() override;
+		void lightInit() override;
+		void skyboxInit() override;
+		void beforeRenderLoop() override;
+		void renderLoop() override;
+		void afterRenderLoop() override;
 	};
 
 }
