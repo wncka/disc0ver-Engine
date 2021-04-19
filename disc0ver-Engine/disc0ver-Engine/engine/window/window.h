@@ -85,6 +85,7 @@ namespace disc0ver
 		// 构造函数
 		Window(int width, int height, const char* title, IBaseCamera* camera) :windowWidth(width), windowHeight(height)
 		{
+			glfwWindowHint(GLFW_SAMPLES, 4);
 			glfwWindow = glfwCreateWindow(windowWidth, windowHeight, title, NULL, NULL);
 			if (glfwWindow == NULL)
 			{
