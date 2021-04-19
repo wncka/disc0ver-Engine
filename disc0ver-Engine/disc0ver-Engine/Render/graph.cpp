@@ -58,10 +58,10 @@ void disc0ver::triangleModel::draw(Shader& shader)
 	meshes[0].Draw(shader, textures, material);
 }
 
-void disc0ver::triangleModel::addTexture(std::string textureName, const GLchar* texturePath)
+void disc0ver::triangleModel::addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType)
 {
 	/* 三角形模型——添加纹理 */
-	textures.emplace_back(textureName, texturePath);
+	textures.emplace_back(textureName, texturePath, textureType);
 }
 
 //========================================== rectangleModel ======================================
@@ -75,10 +75,10 @@ void disc0ver::rectangleModel::draw(Shader& shader)
 	meshes[0].Draw(shader, textures, material);
 }
 
-void disc0ver::rectangleModel::addTexture(std::string textureName, const GLchar* texturePath)
+void disc0ver::rectangleModel::addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType)
 {
 	/* 矩形模型——添加纹理 */
-	textures.emplace_back(textureName, texturePath);
+	textures.emplace_back(textureName, texturePath, textureType);
 }
 
 
@@ -95,10 +95,10 @@ void disc0ver::circleModel::draw(Shader& shader)
 	meshes[0].Draw(shader, textures, material, GL_TRIANGLE_FAN);
 }
 
-void disc0ver::circleModel::addTexture(std::string textureName, const GLchar* texturePath)
+void disc0ver::circleModel::addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType)
 {
 	/* 圆形模型——添加纹理 */
-	textures.emplace_back(textureName, texturePath);
+	textures.emplace_back(textureName, texturePath, textureType);
 }
 
 //========================================== hollowCircleModel ======================================
@@ -110,10 +110,10 @@ void disc0ver::hollowCircleModel::draw(Shader& shader)
 	meshes[0].Draw(shader, textures, material, GL_TRIANGLE_STRIP);
 }
 
-void disc0ver::hollowCircleModel::addTexture(std::string textureName, const GLchar* texturePath)
+void disc0ver::hollowCircleModel::addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType)
 {
 	/* 圆环模型——添加纹理 */
-	textures.emplace_back(textureName, texturePath);
+	textures.emplace_back(textureName, texturePath, textureType);
 }
 
 //========================================== cubeModel ======================================
@@ -130,10 +130,10 @@ void disc0ver::cubeModel::draw(Shader& shader)
 	glDisable(GL_CULL_FACE);
 }
 
-void disc0ver::cubeModel::addTexture(std::string textureName, const GLchar* texturePath)
+void disc0ver::cubeModel::addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType)
 {
 	/* 立方体模型——添加纹理 */
-	textures.emplace_back(textureName, texturePath);
+	textures.emplace_back(textureName, texturePath, textureType);
 }
 
 
@@ -154,10 +154,10 @@ void disc0ver::cylinderModel::draw(Shader& shader)
 	glDisable(GL_CULL_FACE);
 }
 
-void disc0ver::cylinderModel::addTexture(std::string textureName, const GLchar* texturePath)
+void disc0ver::cylinderModel::addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType)
 {
 	/* 圆柱模型——添加纹理 */
-	textures.emplace_back(textureName, texturePath);
+	textures.emplace_back(textureName, texturePath, textureType);
 }
 
 
@@ -176,10 +176,10 @@ void disc0ver::sphereModel::draw(Shader& shader)
 	glDisable(GL_CULL_FACE);
 }
 
-void disc0ver::sphereModel::addTexture(std::string textureName, const GLchar* texturePath)
+void disc0ver::sphereModel::addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType)
 {
 	/* 球体模型——添加纹理 */
-	textures.emplace_back(textureName, texturePath);
+	textures.emplace_back(textureName, texturePath, textureType);
 }
 
 //========================================== ringModel ======================================
@@ -194,10 +194,10 @@ void disc0ver::ringModel::draw(Shader& shader)
 	glDisable(GL_CULL_FACE);
 }
 
-void disc0ver::ringModel::addTexture(std::string textureName, const GLchar* texturePath)
+void disc0ver::ringModel::addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType)
 {
 	/* 球体模型——添加纹理 */
-	textures.emplace_back(textureName, texturePath);
+	textures.emplace_back(textureName, texturePath, textureType);
 }
 
 //========================================== STLModel ======================================

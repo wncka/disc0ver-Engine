@@ -36,10 +36,10 @@ namespace disc0ver {
 		// 绘制模型
 		virtual void draw(Shader& shader) = 0;
 		// 添加纹理--适用于普通(简单)模型
-		virtual void addTexture(std::string textureName, const GLchar* texturePath) = 0;
-		void addTexture(std::string textureName, std::string texturePath)
+		virtual void addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType = TextureType::DIFFUSE) = 0;
+		void addTexture(std::string textureName, std::string texturePath, TextureType textureType = TextureType::DIFFUSE)
 		{
-			addTexture(textureName, texturePath.c_str());
+			addTexture(textureName, texturePath.c_str(), textureType);
 		}
 		// 获取模型材质--适用于普通(简单)模型
 		virtual Material* getMaterial() = 0;
@@ -83,7 +83,7 @@ namespace disc0ver {
 		}
 		~triangleModel() {}
 		void draw(Shader& shader) override;
-		void addTexture(std::string textureName, const GLchar* texturePath) override;
+		void addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType = TextureType::DIFFUSE) override;
 		Material* getMaterial() override { return &material; }
 	private:
 		static std::vector<BaseMesh> meshes;
@@ -115,7 +115,7 @@ namespace disc0ver {
 		}
 		~rectangleModel() {}
 		void draw(Shader& shader) override;
-		void addTexture(std::string textureName, const GLchar* texturePath) override;
+		void addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType = TextureType::DIFFUSE) override;
 		Material* getMaterial() override { return &material; }
 	private:
 		static std::vector<BaseMesh> meshes;
@@ -154,7 +154,7 @@ namespace disc0ver {
 		}
 		~circleModel() {}
 		void draw(Shader& shader) override;
-		void addTexture(std::string textureName, const GLchar* texturePath) override;
+		void addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType = TextureType::DIFFUSE) override;
 		Material* getMaterial() override { return &material; }
 	private:
 		static std::vector<BaseMesh> meshes;
@@ -193,7 +193,7 @@ namespace disc0ver {
 		}
 		~hollowCircleModel() {}
 		void draw(Shader& shader) override;
-		void addTexture(std::string textureName, const GLchar* texturePath) override;
+		void addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType = TextureType::DIFFUSE) override;
 		Material* getMaterial() override { return &material; }
 	private:
 		// r1>r2
@@ -268,7 +268,7 @@ namespace disc0ver {
 		}
 		~cubeModel() {}
 		void draw(Shader& shader) override;
-		void addTexture(std::string textureName, const GLchar* texturePath) override;
+		void addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType = TextureType::DIFFUSE) override;
 		Material* getMaterial() override { return &material; }
 
 	private:
@@ -321,7 +321,7 @@ namespace disc0ver {
 		}
 		~cylinderModel() {}
 		void draw(Shader& shader) override;
-		void addTexture(std::string textureName, const GLchar* texturePath) override;
+		void addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType = TextureType::DIFFUSE) override;
 		Material* getMaterial() override { return &material; }
 	private:
 		static std::vector<BaseMesh> meshes;
@@ -390,7 +390,7 @@ namespace disc0ver {
 		}
 		~sphereModel() {}
 		void draw(Shader& shader) override;
-		void addTexture(std::string textureName, const GLchar* texturePath) override;
+		void addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType = TextureType::DIFFUSE) override;
 		Material* getMaterial() override { return &material; }
 	private:
 		static std::vector<BaseMesh> meshes;
@@ -455,7 +455,7 @@ namespace disc0ver {
 		}
 		~ringModel() {}
 		void draw(Shader& shader) override;
-		void addTexture(std::string textureName, const GLchar* texturePath) override;
+		void addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType = TextureType::DIFFUSE) override;
 		Material* getMaterial() override { return &material; }
 	private:
 		// r1>r2
@@ -495,7 +495,7 @@ namespace disc0ver {
 		void draw(Shader& shader) override;
 
 		// 我建议不要使用这个函数 因为模型文件有其对应的纹理(如果有 则相关信息可以在.mtl文件中找到) 添加不匹配的纹理可能造成奇怪的结果 这也是为什么它什么都不做
-		void addTexture(std::string textureName, const GLchar* texturePath) override { }
+		void addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType = TextureType::DIFFUSE) override { }
 		// 这个函数同理
 		Material* getMaterial() override { return nullptr; }
 
@@ -526,7 +526,7 @@ namespace disc0ver {
 		void draw(Shader& shader) override;
 
 		// 我建议不要使用这个函数 因为模型文件有其对应的纹理(如果有 则相关信息可以在.mtl文件中找到) 添加不匹配的纹理可能造成奇怪的结果 这也是为什么它什么都不做
-		void addTexture(std::string textureName, const GLchar* texturePath) override { }
+		void addTexture(std::string textureName, const GLchar* texturePath, TextureType textureType = TextureType::DIFFUSE) override { }
 		// 这个函数同理
 		Material* getMaterial() override { return nullptr; }
 
