@@ -54,6 +54,7 @@ void disc0ver::BaseMesh::Draw(Shader& shader, std::vector<Texture>& textures, Ma
 	*/
 	bool useTextureDiffuse = false;
 	bool useTextureSpecular = false;
+	bool useTextureBump = false;
 	for (unsigned int i = 0; i < textures.size(); i++)
 	{
 		textures[i].use(i);
@@ -66,6 +67,11 @@ void disc0ver::BaseMesh::Draw(Shader& shader, std::vector<Texture>& textures, Ma
 		{
 			useTextureSpecular = true;
 			shader.setInt("material.texture_specular", static_cast<int>(i));
+		}
+		else if (textures[i].getType() == TextureType::BUMP)
+		{
+			useTextureBump = true;
+			shader.setInt("material.texture_bump", static_cast<int>(i));
 		}
 	}
 	if (useTextureDiffuse)
@@ -83,7 +89,15 @@ void disc0ver::BaseMesh::Draw(Shader& shader, std::vector<Texture>& textures, Ma
 		shader.setBool("material.use_texture_specular", false);
 		shader.setVec3("material.specular_color", material.Ks);
 	}
-	shader.setFloat("material.shininess", material.Ns / 1000 * 256);
+	if (useTextureBump)
+	{
+		shader.setBool("material.use_texture_bump", true);
+	}
+	else
+	{
+		shader.setBool("material.use_texture_bump", false);
+	}
+	shader.setFloat("material.shininess", material.Ns);
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_DRAW_MODE, indices.size(), GL_UNSIGNED_INT, 0);
@@ -103,6 +117,7 @@ void disc0ver::Mesh::Draw(Shader& shader, unsigned int GL_DRAW_MODE)
 	*/
 	bool useTextureDiffuse = false;
 	bool useTextureSpecular = false;
+	bool useTextureBump = false;
 	for (unsigned int i = 0; i < textures.size(); i++)
 	{
 		textures[i].use(i);
@@ -115,6 +130,11 @@ void disc0ver::Mesh::Draw(Shader& shader, unsigned int GL_DRAW_MODE)
 		{
 			useTextureSpecular = true;
 			shader.setInt("material.texture_specular", static_cast<int>(i));
+		}
+		else if (textures[i].getType() == TextureType::BUMP)
+		{
+			useTextureBump = true;
+			shader.setInt("material.texture_bump", static_cast<int>(i));
 		}
 	}
 	if (useTextureDiffuse)
@@ -131,6 +151,14 @@ void disc0ver::Mesh::Draw(Shader& shader, unsigned int GL_DRAW_MODE)
 	{
 		shader.setBool("material.use_texture_specular", false);
 		shader.setVec3("material.specular_color", material.Ks);
+	}
+	if (useTextureBump)
+	{
+		shader.setBool("material.use_texture_bump", true);
+	}
+	else
+	{
+		shader.setBool("material.use_texture_bump", false);
 	}
 	shader.setFloat("material.shininess", material.Ns / 1000 * 256);
 
@@ -153,5 +181,9 @@ void disc0ver::Mesh::addMaterial(Material material)
 	if (!this->material.map_Ks.empty())
 	{
 		textures.emplace_back(this->material.map_Ks, this->material.map_Ks.c_str(), TextureType::SPECULAR);
+	}
+	if (!this->material.map_bump.empty())
+	{
+		textures.emplace_back(this->material.map_bump, this->material.map_bump.c_str(), TextureType::BUMP);
 	}
 }

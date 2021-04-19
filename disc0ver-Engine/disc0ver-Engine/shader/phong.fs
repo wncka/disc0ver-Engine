@@ -8,9 +8,12 @@ struct Material
 	sampler2D texture_diffuse;
   // 镜面光贴图
 	sampler2D texture_specular;
+  // 凹凸贴图
+  sampler2D texture_bump;
   // 是否使用上述贴图
 	bool use_texture_diffuse;
   bool use_texture_specular;
+  bool use_texture_bump;
   // 环境光、漫反射、镜面光 颜色分量(如果不使用贴图 将使用这些值进行计算)
 	vec3 ambient_color;
   vec3 diffuse_color;
@@ -88,8 +91,15 @@ vec3 CalSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 void main()
 {
-  // 标准化法向量
-	vec3 norm = normalize(Normal);
+  vec3 norm = Normal;
+  // 法线贴图
+  if(material.use_texture_bump)
+  {
+    norm = texture(material.texture_bump, TexCoord).rgb;
+    norm = norm * 2.0 - 1.0;
+  }
+  // 标准化
+  norm = normalize(norm);
   // 从片段位置指向观察位置的向量
 	vec3 viewDir = normalize(viewPos - FragPos);
 	

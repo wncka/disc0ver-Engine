@@ -24,11 +24,13 @@
 
 namespace disc0ver {
 
-	// 纹理类型 目前支持 漫反射(环境光)贴图 镜面光贴图
+	// 纹理类型 目前支持 漫反射(环境光)贴图 镜面光贴图 凹凸(法线)贴图
+	// 请注意 目前法线贴图没有实现切线空间之类的技术 所以要注意贴图的应用范围(为了得到正确的光照效果 一个立方体可能要用6个不同的法线贴图)
 	enum class TextureType
 	{
 		DIFFUSE,
-		SPECULAR
+		SPECULAR,
+		BUMP
 	};
 
 	class Texture {
@@ -63,6 +65,9 @@ namespace disc0ver {
 				break;
 			case disc0ver::TextureType::SPECULAR:
 				return "specular";
+				break;
+			case disc0ver::TextureType::BUMP:
+				return "bump";
 				break;
 			default:
 				break;

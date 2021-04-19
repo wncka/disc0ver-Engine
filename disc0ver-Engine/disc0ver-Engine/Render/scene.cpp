@@ -59,10 +59,11 @@ void disc0ver::test_master_scene::modelInit()
 	triangle->addTexture("triangle", "images/triangle.png");
 	triangle1->transform.position = disc0ver::Position(-4.0f, 0.0f, 2.0f);
 	triangle1->getMaterial()->setMaterial(disc0ver::DefaultMaterialType::emerald);
-	rect->transform.position = disc0ver::Position(-3.0f, 1.0f, 2.0f);
-	rect->addTexture("long", "images/long.png");
+	rect->transform.position = disc0ver::Position(-3.0f, 0.0f, 2.0f);
+	rect->addTexture("long", "images/brickwall.png");
 	rect1->transform.position = disc0ver::Position(-2.0f, 0.0f, 2.0f);
-	rect1->getMaterial()->setMaterial(disc0ver::DefaultMaterialType::jade);
+	rect1->addTexture("wall", "images/brickwall.png");
+	rect1->addTexture("normal", "images/brickwall_normal.png", TextureType::BUMP);
 	circle->transform.position = disc0ver::Position(-1.0f, 1.0f, 2.0f);
 	circle->addTexture("compass", "images/compass.png");
 	circle1->transform.position = disc0ver::Position(0.0f, 0.0f, 2.0f);
@@ -127,9 +128,9 @@ void disc0ver::test_master_scene::modelInit()
 		std::shared_ptr<disc0ver::IBaseModel> model1(new disc0ver::STLModel("models/stlModels/github-skyline/leo6033-2020.stl"));
 		std::shared_ptr<disc0ver::IBaseModel> model2(new disc0ver::Model("models/objModels/Marry/Marry.obj"));
 		std::shared_ptr<disc0ver::IBaseModel> model3(new disc0ver::Model("models/objModels/Nanosuit/nanosuit.obj"));
-		model1->transform.position = disc0ver::Position(1.0f, 1.0f, 0.0f);
+		model1->transform.position = disc0ver::Position(-1.0f, 1.0f, 0.0f);
 		model2->transform.position = disc0ver::Position(1.0f, 1.0f, 0.0f);
-		model3->transform.position = disc0ver::Position(1.0f, 1.0f, 0.0f);
+		model3->transform.position = disc0ver::Position(3.0f, 1.0f, 0.0f);
 		models.push_back(model1);
 		models.push_back(model2);
 		models.push_back(model3);
@@ -252,7 +253,6 @@ void disc0ver::test_master_scene::renderLoop()
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		for (auto& model : models)
 		{
-			model->transform.rotation = disc0ver::Rotation(sin(glfwGetTime()) * 360.0f, 0.0f, 0.0f);
 			modelShader.setMat4("model", model->transform.trans);
 			model->draw(modelShader);
 		}
